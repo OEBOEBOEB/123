@@ -14,7 +14,8 @@ $(window).load(function(){
 		_imgWidth = $img.width(),
 		_imgHeight = $img.height(),
 		_topDiff = (_frameHeight - _imgHeight) / 2, 
-		_animateSpeed = 200;
+		_animateSpeed = 200,
+		timer, speed = 3000, isHover = false;
 
 		
 	// 設定每張圖片縮放比例
@@ -53,12 +54,22 @@ $(window).load(function(){
 		});
 			
 		_totalWidth += _width - _leftDiff;
+	}).hover(function(){
+		isHover = true;
+		clearTimeout(timer);
+	}, function(){
+		isHover = false;
+		timer = setTimeout(move, speed);
 	});
 		
 	// 當滑鼠點擊在 $gallery 中的 .controls 時
 	$gallery.on('click', '.controls', function(){
 		var $button = $(this);
 		
+		// 如果滑鼠現在是移入狀態就不做動作
+		if(isHover) return;
+		clearTimeout(timer);
+
 		// 重新計算每一個 li 的位置及圖片寬高
 		$li.each(function(){
 			var $this = $(this), 
@@ -68,9 +79,21 @@ $(window).load(function(){
 			$this.data('_index', _index);
 
 			$this.stop(false, true).animate(liCss[_index], _animateSpeed);
+		}, function(){
+			if(!isHover){
+				timer = setTimeout(move, speed);
+			}
 		});
 
 		return false;
 	});
+
+	// 控制移動用
+	function move() {
+		$('.next').click();
+	}
+ 
+	// 啟動計時器
+	timer = setTimeout(move, speed);
 });
 
